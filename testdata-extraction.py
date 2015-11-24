@@ -5,8 +5,6 @@ Created on Sun Nov 22 13:16:51 2015
 @author: ashwin
 """
 import json
-import pandas as pd
-from operator import itemgetter
 from sets import Set
 import pickle
 
@@ -97,22 +95,4 @@ pklfile.close()
 
 pklfile = open('users.pkl','wb')
 pickle.dump(users,pklfile)
-pklfile.close()
-
-
-
-
-            
-#reviews_user = dict((k, v) for k, v in reviews_user.iteritems() if len(v)>0)
-#for user_id,review in reviews_user.iteritems():
-#    if len(review) > 0:
-##        print review
-
-
-#print reviews[biz_ids[0]]
-    
-    
-#df = pd.DataFrame(restaurants)
-
-#print df
-    
+pklfile.close()    

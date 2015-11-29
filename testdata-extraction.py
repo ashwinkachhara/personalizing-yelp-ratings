@@ -56,7 +56,7 @@ for line in reviewsFile:
     if ob['business_id'] in biz_ids:
         reviews[ob['business_id']].append(ob)
         user_ids.add(ob['user_id'])
-        numReviews = numReviews + 1
+        numReviews += 1
 
 print "Found",numReviews,"reviews"
         

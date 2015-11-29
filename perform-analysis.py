@@ -3,10 +3,13 @@
 # Compare words in sentence to words in bucket. If word matched perform a sentiment analysis.
 # Possible algorithm
 # wordMatches * sentiment  summed over all sentences
-import json
+import json, sys, os
 
 from random import randrange
 from nltk.tokenize import sent_tokenize
+
+from sentiment.info import setup, MyDict, classify2, classify_demo
+setup()
 
 # Create Flavor Class to store values
 class FlavorRating:
@@ -18,12 +21,17 @@ class FlavorRating:
 
 # Create helper functions
 def get_sentiment(text):
-    random_number = randrange(0, 2, 1)
-    if 0 == random_number:
+    # Get the sentiment
+    sentiment = classify2(text)
+    # print sentiment
+
+    if sentiment[0] and (sentiment[1] > .5):
         return 'pos'
-    if 1 == random_number:
+
+    if not sentiment[0] and (sentiment[1] > .5):
         return 'neg'
     return 'net'
+
 
 def taste_algorithm():
     return .2
@@ -43,8 +51,10 @@ healthScoreArray = []
 speedScoreArray = []
 tasteScoreArray = []
 
+index = 0;
 # Loop through all of the reviews -- should either be for a user OR a business
 for line in reviewsFile:
+    index += 1
     # Get the review json
     reviewJson = json.loads(line)
 
@@ -74,6 +84,9 @@ for line in reviewsFile:
         if sentimentGroup == 'net':
             break
 
+        print sentence
+        print sentimentGroup
+
         # Try all of the buckets that matched
         if hasTaste:
             tasteScoreArray.append(-1 * taste_algorithm() if sentimentGroup == 'neg' else taste_algorithm())
@@ -84,15 +97,16 @@ for line in reviewsFile:
         if hashealth:
             healthScoreArray.append(-1 * taste_algorithm() if sentimentGroup == 'neg' else taste_algorithm())
 
-    break
+    if index > 50:
+        break
 
 # Generate an overall flavorRating
 flavorRating = FlavorRating()
 
 # Set the flavor rating values
-flavorRating.health = sum(healthScoreArray) / float(len(healthScoreArray))
-flavorRating.taste = sum(tasteScoreArray) / float(len(tasteScoreArray))
-flavorRating.speed = sum(speedScoreArray) / float(len(speedScoreArray))
+flavorRating.health = sum(healthScoreArray) / float(len(healthScoreArray)) if len(healthScoreArray) > 0 else 0
+flavorRating.taste = sum(tasteScoreArray) / float(len(tasteScoreArray)) if len(tasteScoreArray) > 0 else 0
+flavorRating.speed = sum(speedScoreArray) / float(len(speedScoreArray)) if len(speedScoreArray) > 0 else 0
 
 print flavorRating.taste
 print flavorRating.health

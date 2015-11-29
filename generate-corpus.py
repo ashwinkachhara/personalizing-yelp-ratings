@@ -23,7 +23,7 @@ class Cortical:
     def similarity(self, s1="", s2=""):
         body = json.dumps([{"text": s1},{"text": s2}])
         result = self.compareApi.compare(self.RETINA_NAME, body)
-        
+
 #        print result.weightedScoring
 #        print result.cosineSimilarity
 #        print result.jaccardDistance
@@ -34,23 +34,23 @@ class Cortical:
         for word in s2:
             req = req + json.dumps([{"text": s1},{"text": word}]) + ','
         req = req[:-1]+']'
-        
+
         result = self.compareApi.compareBulk(self.RETINA_NAME,req)
-        
+
         return [r.weightedScoring for r in result]
-            
+
 
 def bulkBucketSimilarity(word):
     tastevector = c.bulkSimilarity(word,tasteBucket)
-    
+
     healthvector = c.bulkSimilarity(word,healthBucket)
-    
+
     speedvector = c.bulkSimilarity(word,speedBucket)
     print tastevector
     print healthvector
     print speedvector
     return [sum(tastevector)/len(tastevector),sum(healthvector)/len(healthvector),sum(speedvector)/len(speedvector)]
-      
+
 
 def bucketSimilarity(word):
     tastevector = []
@@ -61,7 +61,7 @@ def bucketSimilarity(word):
             tastevector.append(newval)
         except Exception:
             pass
-    
+
     healthvector = []
     for bucketword in healthBucket:
         try:
@@ -70,7 +70,7 @@ def bucketSimilarity(word):
             healthvector.append(newval)
         except Exception:
             pass
-    
+
     speedvector = []
     for bucketword in speedBucket:
         try:
@@ -79,9 +79,9 @@ def bucketSimilarity(word):
             speedvector.append(newval)
         except Exception:
             pass
-    
+
     return [sum(tastevector)/len(tastevector),sum(healthvector)/len(healthvector),sum(speedvector)/len(speedvector)]
-    
+
 #    return sum(tastevector)/len(tastevector)
 
 # First generate a list of business that are in the correct categories.

@@ -49,6 +49,6 @@ print len(tasteBucket),tasteBucket
 print len(healthBucket),healthBucket
 print len(speedBucket),speedBucket
 
-pklfile = open('full-buckets.pkl','wb')
-pickle.dump([tasteBucket,healthBucket,speedBucket],pklfile)
-pklfile.close()
+#pklfile = open('full-buckets.pkl','wb')
+#pickle.dump([tasteBucket,healthBucket,speedBucket],pklfile)
+#pklfile.close()

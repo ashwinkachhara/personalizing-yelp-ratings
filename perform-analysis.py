@@ -102,6 +102,8 @@ for businesses in reviewsFile.values():
 
         # Add the sentiment array to the current reviewItem
         reviewItem['sentiment'] = []
+        # Add the wc array to the current reviewItem [[wc#taste, wc#health, wc#speed],[...], ... ]
+        reviewItem['matchedWC'] = []
 
         # Loop through all of the sentences
         for sentence in reviewSentences:
@@ -121,6 +123,8 @@ for businesses in reviewsFile.values():
 
             # Add the sentences sentiment value to the array of sentiments
             reviewItem['sentiment'].append(sentimentGroup)
+            # Add the sentences wc value to the array of wc
+            reviewItem['matchedWC'].append([len(tasteBucket & sentenceWordSet),len(healthBucket & sentenceWordSet),len(speedBucket & sentenceWordSet)])
 
             # If neutral, skip this sentence
 #            if sentimentGroup[0] == 'neutral':
@@ -155,7 +159,7 @@ for businesses in reviewsFile.values():
 #print flavorRating.health
 #print flavorRating.speed
 
-pklfile = open('generated_files/businesses_with_sentiment.pkl', 'wb')
+pklfile = open('generated_files/businesses_sentiment_wc.pkl', 'wb')
 pickle.dump(reviewsFile, pklfile)
 pklfile.close()
 

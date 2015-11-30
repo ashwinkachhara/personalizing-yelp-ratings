@@ -15,7 +15,7 @@ from sentiment.info import setup, MyDict, classify2
 setup()
 
 # Get a set of words for all of the grouping buckets
-pklfile = open('full-buckets.pkl', 'rb')
+pklfile = open('generated_files/full-buckets.pkl', 'rb')
 tasteBucket, healthBucket, speedBucket = pickle.load(pklfile)
 pklfile.close()
 
@@ -72,8 +72,7 @@ def taste_algorithm():
 
 
 # Load the file containing all of the reviews
-# NOTE: TEMP FILE FOR TESTING
-pklfile = open('reviews.pkl', 'rb')
+pklfile = open('generated_files/reviews.pkl', 'rb')
 reviewsFile = pickle.load(pklfile)
 pklfile.close()
 
@@ -156,7 +155,7 @@ for businesses in reviewsFile.values():
 #print flavorRating.health
 #print flavorRating.speed
 
-pklfile = open('businesses_with_sentiment.pkl', 'wb')
+pklfile = open('generated_files/businesses_with_sentiment.pkl', 'wb')
 pickle.dump(reviewsFile, pklfile)
 pklfile.close()
 

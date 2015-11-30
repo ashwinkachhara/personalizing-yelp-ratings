@@ -10,8 +10,8 @@ import requests
 from nltk.tokenize import sent_tokenize
 
 # Import the old sentiment analyzer -- will replace.
-from sentiment.info import setup, MyDict, classify2
-setup()
+# from sentiment.info import setup, MyDict, classify2
+# setup()
 
 # Get a set of words for all of the grouping buckets
 pklfile = open('full-buckets.pkl', 'rb')
@@ -43,18 +43,18 @@ class FlavorRating:
 
 
 # Create helper functions
-def get_sentiment(text):
-    # Get the sentiment
-    sentiment = classify2(text)
-    # print sentiment
-
-    if sentiment[0] and (sentiment[1] > .5):
-        return ['pos', sentiment[1]]
-
-    if not sentiment[0] and (sentiment[1] > .5):
-        return ['neg', sentiment[1]]
-
-    return ['neutral', 0]
+# def get_sentiment(text):
+#     # Get the sentiment
+#     sentiment = classify2(text)
+#     # print sentiment
+#
+#     if sentiment[0] and (sentiment[1] > .5):
+#         return ['pos', sentiment[1]]
+#
+#     if not sentiment[0] and (sentiment[1] > .5):
+#         return ['neg', sentiment[1]]
+#
+#     return ['neutral', 0]
 
 
 # Convert to this when finalizing and have data writing to file properly. -- should only use this on 1 run

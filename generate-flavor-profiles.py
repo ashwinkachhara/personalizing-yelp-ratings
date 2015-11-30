@@ -18,10 +18,11 @@ class FlavorRating:
         self.speed = 0
         self.taste = 0
         self.reviewCount = 0
+        self.totalMatchedWordCount = 0
 
 
 # Load the file containing all of the reviews with their sentiment values
-pklfile = open('generated_files/businesses_with_sentiment', 'rb')
+pklfile = open('generated_files/businesses_with_sentiment.pkl', 'rb')
 reviewsFile = pickle.load(pklfile)
 pklfile.close()
 
@@ -32,5 +33,22 @@ for businessReviews in reviewsFile.values():
         # Get the current review object
         reviewItem = businessReviews[reviewIndex]
 
-        # Get the review text
-        reviewText = reviewItem['text']
+        # Get the current business ID
+        businessID = reviewItem['business_id']
+
+        # Get the current User ID
+        userID = reviewItem['user_id']
+
+        # Get the sentiment list of lists
+        sentimentList = reviewItem['sentiment']
+
+        # Calculate the review sentiment using all the values in the list
+
+        # Apply the calculated sentiment to the business
+
+        # Apply the calculated sentiment to the user
+
+
+# After looping through the file, finalize all calculations for Businesses and Users
+
+# Save data to either 1 or multiple files

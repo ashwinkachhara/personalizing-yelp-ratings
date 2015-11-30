@@ -6,12 +6,13 @@
 import json
 import pickle
 import requests
+import urllib
 
 from nltk.tokenize import sent_tokenize
 
 # Import the old sentiment analyzer -- will replace.
-# from sentiment.info import setup, MyDict, classify2
-# setup()
+from sentiment.info import setup, MyDict, classify2
+setup()
 
 # Get a set of words for all of the grouping buckets
 pklfile = open('full-buckets.pkl', 'rb')
@@ -43,24 +44,26 @@ class FlavorRating:
 
 
 # Create helper functions
-# def get_sentiment(text):
-#     # Get the sentiment
-#     sentiment = classify2(text)
-#     # print sentiment
-#
-#     if sentiment[0] and (sentiment[1] > .5):
-#         return ['pos', sentiment[1]]
-#
-#     if not sentiment[0] and (sentiment[1] > .5):
-#         return ['neg', sentiment[1]]
-#
-#     return ['neutral', 0]
+def get_sentiment(text):
+    # Get the sentiment
+    sentiment = classify2(text)
+    # print sentiment
+    if sentiment[0] and (sentiment[1] > .5):
+        return ['pos', sentiment[1]]
+    if not sentiment[0] and (sentiment[1] > .5):
+        return ['neg', sentiment[1]]
+    return ['neutral', 0]
 
 
 # Convert to this when finalizing and have data writing to file properly. -- should only use this on 1 run
 def get_sentiment_two(text2):
     r = requests.post('http://text-processing.com/api/sentiment/', data="text=" + text2)
-    sentiment_json = json.loads(r.text)
+    try:
+        sentiment_json = json.loads(r.text)
+    except:
+        print text2,'|',r.status_code,'|',r.text
+        r = requests.post('http://text-processing.com/api/sentiment/', data="text=" + urllib.quote_plus(text2))
+        sentiment_json = json.loads(r.text)
     return [sentiment_json['label'], sentiment_json['probability']['neg'], sentiment_json['probability']['neutral'], sentiment_json['probability']['pos'] ]
 
 
@@ -83,8 +86,10 @@ pklfile.close()
 index = 0
 # Loop through all of the reviews -- Currently all of the reviews for the dataset we pulled
 for businesses in reviewsFile.values():
+    index += 1
+    print "Analyzing biz",index
     for i in range(len(businesses)):
-        index += 1
+#        index += 1
 
         # Get the review json
         reviewItem = businesses[i]
@@ -113,14 +118,14 @@ for businesses in reviewsFile.values():
             hasHealth = True if healthBucket & sentenceWordSet else False
 
             # Get which grouping the sentence falls under
-            sentimentGroup = get_sentiment_two(sentence)
+            sentimentGroup = get_sentiment(sentence)
 
             # Add the sentences sentiment value to the array of sentiments
             reviewItem['sentiment'].append(sentimentGroup)
 
             # If neutral, skip this sentence
-            if sentimentGroup[0] == 'neutral':
-                break
+#            if sentimentGroup[0] == 'neutral':
+#                break
 
             # Try all of the buckets that matched
             # if hasTaste:

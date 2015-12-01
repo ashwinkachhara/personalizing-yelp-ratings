@@ -12,6 +12,7 @@ import pickle
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from collections import defaultdict
 
 # Used for the sentiment confidence value
 e = 2.718281828459045
@@ -43,6 +44,12 @@ def isValidSentimentScore(word_count, sentiment):
 pklfile = open('generated_files/businesses_sentiment_wc.pkl', 'rb')
 reviewsFile = pickle.load(pklfile)
 pklfile.close()
+
+# Use this dictionary of lists to store all of the users flavors to then generate a flavor profile
+userSentimentScores = defaultdict(lambda: defaultdict(list))
+
+# Use this dictionary of lists to store all of the restaurants flavors to then generate a flavor profile
+restaurantSentimentScores = defaultdict(lambda: defaultdict(list))
 
 # List used to hold all of the calculated business flavor ratings
 bizFlavors = []
@@ -82,14 +89,20 @@ for businessReviews in reviewsFile.values():
             if sentiments[0] == 'neutral':
                 continue
             
-            if isValidSentimentScore(matchedWordCounts[0], sentiments[0]):
-                tasteScoreArray.append(getSentimentScore(matchedWordCounts[0], sentiments[0]))
+            if isValidSentimentScore(matchedWordCounts[0], sentiments[1]):
+                sentimentScore = getSentimentScore(matchedWordCounts[0], sentiments[1])
+                tasteScoreArray.append(sentimentScore)
+                userSentimentScores[userID]['taste'].append(sentimentScore)
 
             if isValidSentimentScore(matchedWordCounts[1], sentiments[1]):
-                healthScoreArray.append(getSentimentScore(matchedWordCounts[1], sentiments[1]))
+                sentimentScore = getSentimentScore(matchedWordCounts[1], sentiments[1])
+                healthScoreArray.append(sentimentScore)
+                userSentimentScores[userID]['health'].append(sentimentScore)
 
-            if isValidSentimentScore(matchedWordCounts[2], sentiments[2]):
-                speedScoreArray.append(getSentimentScore(matchedWordCounts[2], sentiments[2]))
+            if isValidSentimentScore(matchedWordCounts[2], sentiments[1]):
+                sentimentScore = getSentimentScore(matchedWordCounts[2], sentiments[1])
+                speedScoreArray.append(sentimentScore)
+                userSentimentScores[userID]['score'].append(sentimentScore)
 
         # Apply the calculated sentiment to the review
         tasteScores.append(sum(tasteScoreArray) / float(len(tasteScoreArray)) if len(tasteScoreArray) > 0 else 0)
@@ -120,5 +133,28 @@ ax.set_ylabel('healthScore')
 ax.set_zlabel('speedScore')
 
 # plt.show()
-# fig1 = plt.gcf()
-fig.savefig('test.jpg', dpi=300)
+fig.savefig('images/businesses.jpg', dpi=300)
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Loop through all of the users reviews and generate Flavor Profiles
+for key in userSentimentScores:
+    userHealthList = userSentimentScores[key]['health']
+    userTasteList = userSentimentScores[key]['taste']
+    userSpeedList = userSentimentScores[key]['speed']
+
+    healthValue = sum(userHealthList) / float(len(userHealthList)) if len(userHealthList) > 0 else 0
+    tasteValue = sum(userTasteList) / float(len(userTasteList)) if len(userTasteList) > 0 else 0
+    speedValue = sum(userSpeedList) / float(len(userSpeedList)) if len(userSpeedList) > 0 else 0
+
+    ax.scatter(tasteValue, healthValue, speedValue, c='r', marker='o')
+
+ax.set_xlabel('tasteScore')
+ax.set_ylabel('healthScore')
+ax.set_zlabel('speedScore')
+
+# plt.show()
+fig.savefig('images/users.jpg', dpi=300)
+plt.show()

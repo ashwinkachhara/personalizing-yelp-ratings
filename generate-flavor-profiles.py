@@ -10,6 +10,8 @@
 # Store users and their flavor profiles into a file
 import pickle
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import defaultdict
@@ -26,6 +28,11 @@ class FlavorRating:
         self.taste = 0
         self.reviewCount = 0
         self.totalMatchedWordCount = 0
+        
+    def set(self,t,h,s):
+        self.health = h
+        self.speed = s
+        self.taste = t
 
 
 def getSentimentConfidence(conf):
@@ -45,6 +52,11 @@ pklfile = open('generated_files/businesses_sentiment_wc.pkl', 'rb')
 reviewsFile = pickle.load(pklfile)
 pklfile.close()
 
+pklfile = open('generated_files/reviews_user.pkl', 'rb')
+reviewsUser = pickle.load(pklfile)
+pklfile.close()
+
+
 # Use this dictionary of lists to store all of the users flavors to then generate a flavor profile
 userSentimentScores = defaultdict(lambda: defaultdict(list))
 
@@ -52,7 +64,7 @@ userSentimentScores = defaultdict(lambda: defaultdict(list))
 restaurantSentimentScores = defaultdict(lambda: defaultdict(list))
 
 # List used to hold all of the calculated business flavor ratings
-bizFlavors = []
+bizFlavors = {}
 
 # Loop through the file and calculate the values
 for businessReviews in reviewsFile.values():
@@ -115,13 +127,13 @@ for businessReviews in reviewsFile.values():
     f.taste = sum(tasteScores)/len(tasteScores)
     f.health = sum(healthScores)/len(healthScores)
     f.speed = sum(speedScores)/len(speedScores)
-    bizFlavors.append(f)
+    bizFlavors[businessID] = f;
 
 
 # Plot graph of flavor ratings
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-for f in bizFlavors:
+for f in bizFlavors.values():
 #    print word, wnBucketScores(word)
     ax.scatter(f.taste, f.health, f.speed, c='r', marker='o')
     
@@ -132,6 +144,7 @@ ax.set_zlabel('speedScore')
 # plt.show()
 fig.savefig('images/businesses.jpg', dpi=300)
 
+userFlavors = {}
 
 # Draw all of the unique users flavor profiles on a 3D chart
 fig = plt.figure()
@@ -144,6 +157,10 @@ for key in userSentimentScores:
     healthValue = sum(userHealthList) / float(len(userHealthList)) if len(userHealthList) > 0 else 0
     tasteValue = sum(userTasteList) / float(len(userTasteList)) if len(userTasteList) > 0 else 0
     speedValue = sum(userSpeedList) / float(len(userSpeedList)) if len(userSpeedList) > 0 else 0
+    
+    f = FlavorRating()
+    f.set(tasteValue,healthValue,speedValue)
+    userFlavors[key] = f
 
     ax.scatter(tasteValue, healthValue, speedValue, c='r', marker='o')
 
@@ -151,6 +168,27 @@ ax.set_xlabel('tasteScore')
 ax.set_ylabel('healthScore')
 ax.set_zlabel('speedScore')
 
+plt.show()
+#fig.savefig('images/users.jpg', dpi=300)
 # plt.show()
-fig.savefig('images/users.jpg', dpi=300)
-# plt.show()
+
+
+for key in userFlavors:
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(userFlavors[key].taste,userFlavors[key].health,userFlavors[key].speed,c='b',marker='p');
+    try:
+        theirReviews = reviewsUser[key]
+    except KeyError:
+        plt.close(fig)
+    else:
+        for review in theirReviews:
+            f = bizFlavors[review['business_id']]
+            ax.scatter(f.taste, f.health, f.speed, c='r', marker='o')
+        ax.set_xlabel('tasteScore')
+        ax.set_ylabel('healthScore')
+        ax.set_zlabel('speedScore')
+        fig.savefig('images/users/'+key+'.jpg',dpi=300)
+        plt.close(fig)
+    
+        

@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, jsonify, make_response
-from info import classify2
-from math import e
-from redis import Redis
-from config import STATS_KEY, HOST, RHOST, RPASS, RPORT
-from cors import crossdomain
-from datetime import datetime
 import json
+from datetime import datetime
+from math import e
+
+from config import STATS_KEY, HOST, RHOST, RPASS, RPORT
+from flask import Flask, render_template, request, jsonify, make_response
+from redis import Redis
+
+from cors import crossdomain
+from info import classify2
 
 app = Flask(__name__)
 app.debug = False

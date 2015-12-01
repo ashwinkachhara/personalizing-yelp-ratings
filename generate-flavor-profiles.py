@@ -76,7 +76,8 @@ for businessReviews in reviewsFile.values():
 
         # Get the sentiment list of lists
         sentimentList = reviewItem['sentiment']
-        
+
+        # Get the list of the current reviews matched word count
         matchedWCList = reviewItem['matchedWC']
 
         # Calculate the review sentiment using all the values in the list
@@ -117,10 +118,6 @@ for businessReviews in reviewsFile.values():
     bizFlavors.append(f)
 
 
-# After looping through the file, finalize all calculations for Businesses and Users
-
-# Save data to either 1 or multiple files
-
 # Plot graph of flavor ratings
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -136,10 +133,9 @@ ax.set_zlabel('speedScore')
 fig.savefig('images/businesses.jpg', dpi=300)
 
 
+# Draw all of the unique users flavor profiles on a 3D chart
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-
-# Loop through all of the users reviews and generate Flavor Profiles
 for key in userSentimentScores:
     userHealthList = userSentimentScores[key]['health']
     userTasteList = userSentimentScores[key]['taste']
@@ -157,4 +153,4 @@ ax.set_zlabel('speedScore')
 
 # plt.show()
 fig.savefig('images/users.jpg', dpi=300)
-plt.show()
+# plt.show()

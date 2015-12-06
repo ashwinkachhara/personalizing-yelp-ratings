@@ -13,22 +13,28 @@ sys.path.append(os.getcwd()+'/cortical/')
 from cortical.client import ApiClient
 from compareApi import CompareApi
 
+# This class uses the Cortical API to calculate wordSimilarity
 class Cortical:
+    # Variables needed to make calls to the Cortical API
     BASE_PATH = "http://api.cortical.io/rest"
     API_KEY = "4b6b3100-bf81-11e4-b8ca-f119f1630c46"
     RETINA_NAME = "en_associative"
+
+    # Constructor
     def __init__(self):
         self.compareApi = CompareApi(ApiClient(apiKey=self.API_KEY, apiServer=self.BASE_PATH))
 
+    # Returns similarity between two pieces of text
     def similarity(self, s1="", s2=""):
+        #        print result.weightedScoring
+        #        print result.cosineSimilarity
+        #        print result.jaccardDistance
+        #        print result.euclideanDistance
         body = json.dumps([{"text": s1},{"text": s2}])
         result = self.compareApi.compare(self.RETINA_NAME, body)
-
-#        print result.weightedScoring
-#        print result.cosineSimilarity
-#        print result.jaccardDistance
-#        print result.euclideanDistance
         return result.weightedScoring
+
+    # Uses bulk mode to get multiple similarity results in a single call
     def bulkSimilarity(self,s1="",s2=[]):
         req = '['
         for word in s2:
@@ -39,7 +45,7 @@ class Cortical:
 
         return [r.weightedScoring for r in result]
 
-
+# Function uses Cortical class to obtain word similarity with base buckets (bulk mode)
 def bulkBucketSimilarity(word):
     tastevector = c.bulkSimilarity(word,tasteBucket)
 
@@ -51,43 +57,34 @@ def bulkBucketSimilarity(word):
     print speedvector
     return [sum(tastevector)/len(tastevector),sum(healthvector)/len(healthvector),sum(speedvector)/len(speedvector)]
 
-
+# Function uses Cortical class to obtain word similarity with base buckets
 def bucketSimilarity(word):
     tastevector = []
     for bucketword in tasteBucket:
         try:
             newval = c.similarity(word,bucketword)
-#            print newval,bucketword
             tastevector.append(newval)
         except Exception:
             pass
-
     healthvector = []
     for bucketword in healthBucket:
         try:
             newval = c.similarity(word,bucketword)
-#            print newval,bucketword
             healthvector.append(newval)
         except Exception:
             pass
-
     speedvector = []
     for bucketword in speedBucket:
         try:
             newval = c.similarity(word,bucketword)
-#            print newval,bucketword
             speedvector.append(newval)
         except Exception:
             pass
-
     return [sum(tastevector)/len(tastevector),sum(healthvector)/len(healthvector),sum(speedvector)/len(speedvector)]
-
-#    return sum(tastevector)/len(tastevector)
 
 # First generate a list of business that are in the correct categories.
 # We want to only pull corpus words from food reviews.
 businessesFile = open('data/yelp_academic_dataset_business.json')
-
 
 # Load the file containing all of the reviews
 reviewsFile = open('data/yelp_academic_dataset_review.json')
@@ -174,7 +171,7 @@ print c.similarity("spicy","tasteless")
 #print bulkBucketSimilarity("terrible speed")
 print bulkBucketSimilarity("spicy")
 #print bulkBucketSimilarity("backrub")
-    
+
 
 #print bucketSimilarity("sluggish")
 

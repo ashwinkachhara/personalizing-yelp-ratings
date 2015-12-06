@@ -7,29 +7,7 @@ Created on Sat Nov 28 18:18:15 2015
 from nltk.corpus import wordnet as wn
 import pickle
 
-
-#tasteBucket = ["piquant","savory","savoury","zesty","gamy","gamey","juicy","tasty","flat","flavorless","flavourless","insipid","savorless","savourless",    "vapid","smooth","suave","diplomatic","diplomatical","tasteless","unexciting","unstimulating","salty"]
-#
-#healthBucket = ["refreshing","refreshful","tonic","new","invigorated","refreshed","reinvigorated","unfermented","clean","energising","energizing","preserved","rotten","stale","crisp","crunchy","firm","fresh-cut","pure","unprocessed","unsoured","unspoiled","unspoilt","new-made","oily","oleaginous","fat","fatty","insalubrious","unhealthful","unwholesome"]
-#
-#speedBucket = ["speedy","flying","fast","agile","nimble","ready","immediate","prompt","straightaway","fast","active","promptly","quickly","active","sluggish","delayed","unhurried","inactive","laggard","behind","slack","slacken"]
-
-#wnTasteBucket = []
-
-#for word in tasteBucket:
-#    ss = wn.synsets(word)
-#    query = word+':'+'\n'
-#    for i in range(len(ss)):
-#        query = query +str(i)+str(ss[i])+':'+ss[i].definition()+'\n'
-#    selection = 0
-#    while selection!=-1:
-#        selection = int(raw_input(query+"select: "))
-#        if selection != -1:
-#            wnTasteBucket.append(ss[selection])
-##            print wnTasteBucket
-#        else:
-#            break
-    
+# wnTasteBucket, wnHealthBucket, wnSpeedBucket contain base buckets with semantic connotations
 wnTasteBucket = [wn.synset('piquant.s.02'),
  wn.synset('savory.a.01'),
  wn.synset('mouth-watering.s.01'),
@@ -47,22 +25,6 @@ wnTasteBucket = [wn.synset('piquant.s.02'),
  wn.synset('unexciting.a.02'),
  wn.synset('salty.a.02')]
 
-#wnHealthBucket = []
-#
-#for word in healthBucket:
-#    ss = wn.synsets(word)
-#    query = word+':'+'\n'
-#    for i in range(len(ss)):
-#        query = query +str(i)+str(ss[i])+':'+ss[i].definition()+'\n'
-#    selection = 0
-#    while selection!=-1:
-#        selection = int(raw_input(query+"select: "))
-#        if selection != -1:
-#            wnHealthBucket.append(ss[selection])
-##            print wnTasteBucket
-#        else:
-#            break
-        
 wnHealthBucket = [wn.synset('oily.s.03'),
  wn.synset('fresh-cut.s.01'),
  wn.synset('inspire.v.01'),
@@ -101,22 +63,6 @@ wnHealthBucket = [wn.synset('oily.s.03'),
  wn.synset('unsanitary.a.01'),
  wn.synset('quicken.v.03')]
 
-#wnSpeedBucket = []
-#
-#for word in speedBucket:
-#    ss = wn.synsets(word)
-#    query = word+':'+'\n'
-#    for i in range(len(ss)):
-#        query = query +str(i)+str(ss[i])+':'+ss[i].definition()+'\n'
-#    selection = 0
-#    while selection!=-1:
-#        selection = int(raw_input(query+"select: "))
-#        if selection != -1:
-#            wnSpeedBucket.append(ss[selection])
-##            print wnTasteBucket
-#        else:
-#            break
-        
 wnSpeedBucket = [wn.synset('fast-flying.s.01'),
  wn.synset('ready.n.01'),
  wn.synset('fly.v.02'),
@@ -153,28 +99,23 @@ wnSpeedBucket = [wn.synset('fast-flying.s.01'),
  wn.synset('agile.s.02'),
  wn.synset('agile.s.01')]
 
-
 tasteBucket = []
 healthBucket = []
 speedBucket = []
 
+# We convert a synset list into a wordlist
 for s in wnSpeedBucket:
     speedBucket = speedBucket + [x for x in s.lemma_names() if '_' not in x]
 for s in wnTasteBucket:
     tasteBucket = tasteBucket + [x for x in s.lemma_names() if '_' not in x]
 for s in wnHealthBucket:
     healthBucket = healthBucket + [x for x in s.lemma_names() if '_' not in x]
-    
+
 speedBucket = list(set(speedBucket))
 healthBucket = list(set(healthBucket))
 tasteBucket = list(set(tasteBucket))
 
-#print len(tasteBucket), tasteBucket
-#print len(healthBucket), healthBucket
-#print len(speedBucket), speedBucket
-
-pklfile = open('base-buckets.pkl','wb')
+# Save base-buckets.pkl
+pklfile = open('generated_files/base-buckets.pkl','wb')
 pickle.dump([tasteBucket,healthBucket,speedBucket],pklfile)
 pklfile.close()
-
-

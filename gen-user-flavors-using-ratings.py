@@ -33,23 +33,28 @@ class FlavorRating:
         self.reviewCount = 0
         self.totalMatchedWordCount = 0
         
+#    Sets values of t,h,s
     def set(self,t,h,s):
         self.health = h
         self.speed = s
         self.taste = t
         
+#    Prints to console
     def show(self):
         print self.taste,self.health,self.speed
 
-
+#Return sentiment confidence betweeen 0 and 1
 def getSentimentConfidence(conf):
     return (e ** conf) / (1 + e**conf)
 
+#Return rating weights to calculate user FlavorRating
 def getRatingWeight(val):
+#    We use a logarithmic function. 1star = 0, 5star = 1
     return math.log(val,5)
 
-# Returns the sentiment score given a word count and sentiment value. Can expand algorithm later
+# Returns the [sentiment score, weight] given a word count and sentiment value. Can expand algorithm later
 def getSentimentScore(word_count, sentiment):
+#    Provision for weighting positive sentiments and negative sentiments differently
     poswt = 3
     negwt = 1
     if sentiment == 'pos':
@@ -61,23 +66,20 @@ def getSentimentScore(word_count, sentiment):
 def isValidSentimentScore(word_count, sentiment):
     return word_count > 0 and getSentimentConfidence(sentiment) > confidenceMin
 
-# Load the file containing all of the reviews with their sentiment values
+# Load the file containing all of the reviews with their sentiment values (indexed by business id)
 pklfile = open('generated_files/businesses_sentiment_wc.pkl', 'rb')
 reviewsFile = pickle.load(pklfile)
 pklfile.close()
 
+#Load the file containting all reviews indexed by user id
 pklfile = open('generated_files/reviews_user.pkl', 'rb')
 reviewsUser = pickle.load(pklfile)
 pklfile.close()
 
-
-# Use this dictionary of lists to store all of the users flavors to then generate a flavor profile
-userSentimentScores = defaultdict(lambda: defaultdict(list))
-
 # Use this dictionary of lists to store all of the restaurants flavors to then generate a flavor profile
 restaurantSentimentScores = defaultdict(lambda: defaultdict(list))
 
-# List used to hold all of the calculated business flavor ratings
+# Dict used to hold all of the calculated business flavor ratings, indexed by business_id
 bizFlavors = {}
 
 # Loop through the file and calculate the values
@@ -87,10 +89,12 @@ for businessReviews in reviewsFile.values():
     healthScores = []
     speedScores = []
     for reviewIndex in range(len(businessReviews)):
+#        Arrays to store sentiment scores
         tasteScoreArray = []
         healthScoreArray = []
         speedScoreArray = []
         
+#        Arrays to store weights, to normalize tasteScore for restaurant
         tasteWtsArray = []
         healthWtsArray = []
         speedWtsArray = []
@@ -124,19 +128,16 @@ for businessReviews in reviewsFile.values():
                 sentimentScore, sentimentWt = getSentimentScore(matchedWordCounts[0], sentiments[1])
                 tasteScoreArray.append(sentimentScore)
                 tasteWtsArray.append(sentimentWt)
-                userSentimentScores[userID]['taste'].append(sentimentScore)
 
             if isValidSentimentScore(matchedWordCounts[1], sentiments[1]):
                 sentimentScore, sentimentWt = getSentimentScore(matchedWordCounts[1], sentiments[1])
                 healthScoreArray.append(sentimentScore)
                 healthWtsArray.append(sentimentWt)
-                userSentimentScores[userID]['health'].append(sentimentScore)
 
             if isValidSentimentScore(matchedWordCounts[2], sentiments[1]):
                 sentimentScore, sentimentWt = getSentimentScore(matchedWordCounts[2], sentiments[1])
                 speedScoreArray.append(sentimentScore)
                 speedWtsArray.append(sentimentWt)
-                userSentimentScores[userID]['score'].append(sentimentScore)
 
         # Apply the calculated sentiment to the review
         tasteScores.append(sum(tasteScoreArray) / float(sum(tasteWtsArray)) if len(tasteScoreArray) > 0 else 0)
@@ -150,12 +151,11 @@ for businessReviews in reviewsFile.values():
     f.speed = sum(speedScores)/len(speedScores)
     bizFlavors[businessID] = f;
 
+# Dict used to hold all of the calculated business flavor ratings, indexed by user_id
 userFlavors = {}
 
-# Draw all of the unique users flavor profiles on a 3D chart
-#fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
-for key in userSentimentScores:
+#Calculating the userFlavors as a weighted average of the restaurants they reviewed
+for key in reviewsUser:
     tasteArray = []
     healthArray = []
     speedArray = []
@@ -164,9 +164,10 @@ for key in userSentimentScores:
     try:
         theirReviews = reviewsUser[key]
     except KeyError:
+        #        Excluding the case where the user might not be present in our data (from diff region, or had only <5 reviews, etc
         pass
-#        plt.close(fig)
     else:
+#        We compute userFlavor if the user did not trigger a KeyError
         for rev in theirReviews:
             bf = FlavorRating()
             try:
@@ -187,26 +188,16 @@ for key in userSentimentScores:
 #        f.show()
         userFlavors[key] = f
     
-    
-
-#    ax.scatter(tasteValue, healthValue, speedValue, c='r', marker='o')
-
-#ax.set_xlabel('tasteScore')
-#ax.set_ylabel('healthScore')
-#ax.set_zlabel('speedScore')
-
-#plt.show()
-#fig.savefig('images/users.jpg', dpi=300)
-# plt.show()
 
 iters = 0
 
+#Color coding reviews on the user-their_reviews graph 0-red -> Gradient <- 4-green
 ratingcolors = ['#F93C3C','#F68C2D','#F3E61E','#94F010','#1EED01']
 
+#We create a scatter plot for each user and store it in specified directory
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 for key in userFlavors:
-    iters = iters + 1
     ax.scatter(userFlavors[key].taste,userFlavors[key].health,userFlavors[key].speed,c='b',marker='p');
     try:
         theirReviews = reviewsUser[key]
@@ -214,6 +205,7 @@ for key in userFlavors:
         pass
 #        plt.close(fig)
     else:
+        iters = iters + 1
         if len(theirReviews)>=5:
             for review in theirReviews:
                 f = bizFlavors[review['business_id']]
@@ -226,12 +218,18 @@ for key in userFlavors:
 #            ax.set_ylim3d(-1,1)
 #            ax.set_zlim3d(-1,1)
             plt.savefig('images/users/'+key+'.jpg',dpi=300)
-#        plt.close(fig)
     plt.cla()
-#    plt.clf()
 #    if iters>50:    
 #        break
 plt.close()
 print("Saved",iters,"figures")
+
+pklfile = open('generated_files/business_FlavorRatings.pkl', 'wb')
+pickle.dump(bizFlavors, pklfile)
+pklfile.close()
+
+pklfile = open('generated_files/users_FlavorRatings.pkl', 'wb')
+pickle.dump(userFlavors, pklfile)
+pklfile.close()
     
         

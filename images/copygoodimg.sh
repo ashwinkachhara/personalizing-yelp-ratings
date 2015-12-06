@@ -1,5 +1,5 @@
-# assuming you have $pic_list as an array of all images
-# i.e. somethiing like pic_list=`find / -iname "*.jpg"`
+# Iterates over all images in specified directory one by one.
+# On user input 'y' it copies current image to another specified directory 
 for pic in ~/Dev/social-data-project/images/usersPosWtRatings/*.jpg
 do
     eog -w $pic &

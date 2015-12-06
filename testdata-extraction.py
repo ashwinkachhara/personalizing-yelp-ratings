@@ -4,7 +4,7 @@ Created on Sun Nov 22 13:16:51 2015
 
 @author: ashwin
 """
-import json
+import json, gc
 from sets import Set
 import pickle
 
@@ -36,16 +36,25 @@ usersFile = open('data/'+ filePrefix + 'user.json')
 
 for line in businessesFile:
     ob = json.loads(line)
-    if ob['state'] == interest_state[state_index] and len(list(set(interest_categories) & set(ob['categories']))) > 0:
+    # Uncomment next line and comment the one after that to restrict data to a single state
+    # if ob['state'] == interest_state[state_index] and len(list(set(interest_categories) & set(ob['categories']))) > 0:
+    if len(list(set(interest_categories) & set(ob['categories']))) > 0:
         restaurants.append(ob)
 
-print "Loaded",len(restaurants),"restaurants in",interest_state[state_index]
+# print "Loaded",len(restaurants),"restaurants in",interest_state[state_index]
+print "Loaded",len(restaurants),"restaurants"
 
 biz_ids = [d['business_id'] for d in restaurants]
 #print biz_ids[:10]
 
 for i in range(len(restaurants)):
     reviews[biz_ids[i]] = []
+
+pklfile = open('full-set/restaurants.pkl','wb')
+pickle.dump(restaurants,pklfile)
+pklfile.close()
+del restaurants
+gc.collect()
 
 user_ids = Set([])
 #print filter(lambda biz: biz['business_id'] == biz_ids[0], restaurants)
@@ -59,40 +68,49 @@ for line in reviewsFile:
         numReviews += 1
 
 print "Found",numReviews,"reviews"
-        
+
+pklfile = open('full-set/reviews.pkl','wb')
+pickle.dump(reviews,pklfile)
+pklfile.close()
+
+del reviews
+gc.collect()
+
 user_ids = list(user_ids)
 
 for line in usersFile:
     ob = json.loads(line)
     if ob['user_id'] in user_ids and ob['review_count'] >= 5:
         users.append(ob)
-        
+
 print "Found", len(users), "users"
 
+pklfile = open('full-set/users.pkl','wb')
+pickle.dump(users,pklfile)
+pklfile.close()
+
 suff_users = [u['user_id'] for u in users]
+
+del users
+gc.collect()
 
 for i in suff_users:
     reviews_user[i] = []
 
+# Using the reviews list of dicts to generate the reviews_user list of dicts is quite memory intensive
+# for biz_id,biz in reviews.iteritems():
+#     for review in biz:
+#         if review['user_id'] in suff_users:
+# #            print review['user_id']
+#             reviews_user[review['user_id']].append(review)
 
-for biz_id,biz in reviews.iteritems():
-    for review in biz:
-        if review['user_id'] in suff_users:
-#            print review['user_id']
-            reviews_user[review['user_id']].append(review)
-            
-pklfile = open('reviews.pkl','wb')
-pickle.dump(reviews,pklfile)
-pklfile.close()
+# Instead of that, I'll re-read the json file and populate the reviews_user list of dicts from that.
+reviewsFile = open('data/'+ filePrefix + 'review.json')
+for line in reviewsFile:
+    ob = json.loads(line)
+    if ob['user_id'] in suff_users:
+        reviews_user[ob['user_id']].append(ob)
 
-pklfile = open('restaurants.pkl','wb')
-pickle.dump(restaurants,pklfile)
-pklfile.close()
-
-pklfile = open('reviews_user.pkl','wb')
+pklfile = open('full-set/reviews_user.pkl','wb')
 pickle.dump(reviews_user,pklfile)
 pklfile.close()
-
-pklfile = open('users.pkl','wb')
-pickle.dump(users,pklfile)
-pklfile.close()    

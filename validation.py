@@ -95,7 +95,7 @@ def predict(reviews, radius, user_flavor_rating):
             pass
         else:
             predictions.append(distance(user_flavor_rating, bf) > radius)
-    return predictions
+    return np.array(predictions)
 
 def performAnalysis(data):
     # Use K Folds for cross-validation to perform analysis on unseen data
@@ -103,6 +103,8 @@ def performAnalysis(data):
     scores = []
     confusion = np.array([[0, 0], [0, 0]])
     ratings = [x['stars'] > 3 for x in data]
+    data = np.array(data)
+    ratings = np.array(ratings)
     for train_indices, test_indices in k_fold:
         train_biz = data[train_indices]
         train_rating = ratings[train_indices]
@@ -124,8 +126,14 @@ def performAnalysis(data):
     print('Score:', sum(scores)/len(scores))
     print('Confusion matrix:')
     print(confusion)
+    
+    outfile.write(str(len(data))+','+str(sum(scores)/len(scores))+','+str(confusion[0][0])+','+str(confusion[0][1])+','+str(confusion[1][0])+','+str(confusion[1][1])+'\n')
+
+outfile = file('validation.csv','w')
 
 for uid in top20:
     reviews = reviewsUser[uid]
     performAnalysis(reviews)
+    
+outfile.close()
 

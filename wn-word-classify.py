@@ -34,7 +34,7 @@ def wnBucketScores(word):
         tasteScore = score/scorenum
     else:
         tasteScore = 0
-    
+
     score = 0
     scorenum = 0
     for taste in wnHealthBucket:
@@ -49,7 +49,7 @@ def wnBucketScores(word):
         healthScore = score/scorenum
     else:
         healthScore = 0
-    
+
     score = 0
     scorenum = 0
     for taste in wnSpeedBucket:
@@ -67,7 +67,7 @@ def wnBucketScores(word):
 
     return [tasteScore,healthScore,speedScore]
 
-pklfile = open('wn-word-corpus.pkl','rb')
+pklfile = open('generated_files/wn-word-corpus.pkl','rb')
 sortedList = pickle.load(pklfile)
 pklfile.close()
 
@@ -81,14 +81,13 @@ for word in sortedList:
     vals = wnBucketScores(word)
     sortedListScores.append(vals)
     ax.scatter(vals[0], vals[1], vals[2],c='r',marker='o')
-    
+
 ax.set_xlabel('tasteScore')
 ax.set_ylabel('healthScore')
 ax.set_zlabel('speedScore')
 
 plt.show()
 
-pklfile = open('wn-word-corpus-scores.pkl','wb')
+pklfile = open('generated_files/wn-word-corpus-scores.pkl','wb')
 pickle.dump(sortedListScores,pklfile)
 pklfile.close()
-

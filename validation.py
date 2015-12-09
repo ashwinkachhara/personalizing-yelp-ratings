@@ -17,13 +17,13 @@ class FlavorRating:
         self.taste = 0
         self.reviewCount = 0
         self.totalMatchedWordCount = 0
-        
+
 #    Sets values of t,h,s
     def set(self,t,h,s):
         self.health = h
         self.speed = s
         self.taste = t
-        
+
 #    Prints to console
     def show(self):
         print self.taste,self.health,self.speed
@@ -126,14 +126,13 @@ def performAnalysis(data):
     print('Score:', sum(scores)/len(scores))
     print('Confusion matrix:')
     print(confusion)
-    
+
     outfile.write(str(len(data))+','+str(sum(scores)/len(scores))+','+str(confusion[0][0])+','+str(confusion[0][1])+','+str(confusion[1][0])+','+str(confusion[1][1])+'\n')
 
-outfile = file('validation.csv','w')
+outfile = file('generated_files/validation.csv','w')
 
 for uid in top20:
     reviews = reviewsUser[uid]
     performAnalysis(reviews)
-    
-outfile.close()
 
+outfile.close()

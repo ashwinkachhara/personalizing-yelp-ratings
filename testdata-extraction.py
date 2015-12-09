@@ -59,14 +59,14 @@ for line in reviewsFile:
         numReviews += 1
 
 print "Found",numReviews,"reviews"
-        
+
 user_ids = list(user_ids)
 
 for line in usersFile:
     ob = json.loads(line)
     if ob['user_id'] in user_ids and ob['review_count'] >= 5:
         users.append(ob)
-        
+
 print "Found", len(users), "users"
 
 suff_users = [u['user_id'] for u in users]
@@ -80,19 +80,19 @@ for biz_id,biz in reviews.iteritems():
         if review['user_id'] in suff_users:
 #            print review['user_id']
             reviews_user[review['user_id']].append(review)
-            
-pklfile = open('reviews.pkl','wb')
+
+pklfile = open('generated_files/reviews.pkl','wb')
 pickle.dump(reviews,pklfile)
 pklfile.close()
 
-pklfile = open('restaurants.pkl','wb')
+pklfile = open('generated_files/restaurants.pkl','wb')
 pickle.dump(restaurants,pklfile)
 pklfile.close()
 
-pklfile = open('reviews_user.pkl','wb')
+pklfile = open('generated_files/reviews_user.pkl','wb')
 pickle.dump(reviews_user,pklfile)
 pklfile.close()
 
-pklfile = open('users.pkl','wb')
+pklfile = open('generated_files/users.pkl','wb')
 pickle.dump(users,pklfile)
-pklfile.close()    
+pklfile.close()

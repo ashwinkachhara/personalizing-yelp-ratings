@@ -11,19 +11,19 @@ from pattern.en.wordlist import PROFANITY
 ## $ pip install vaderSentiment
 from vaderSentiment.vaderSentiment import sentiment
 
-pklfile = open('reviews.pkl', 'rb')
+pklfile = open('generated_files/reviews.pkl', 'rb')
 reviews = pickle.load(pklfile)
 pklfile.close()
 
-pklfile = open('restaurants.pkl', 'rb')
+pklfile = open('generated_files/restaurants.pkl', 'rb')
 restaurants = pickle.load(pklfile)
 pklfile.close()
 
-pklfile = open('reviews_user.pkl', 'rb')
+pklfile = open('generated_files/reviews_user.pkl', 'rb')
 reviews_user = pickle.load(pklfile)
 pklfile.close()
 
-pklfile = open('users.pkl', 'rb')
+pklfile = open('generated_files/users.pkl', 'rb')
 users = pickle.load(pklfile)
 pklfile.close()
 

@@ -10,15 +10,15 @@ import numpy as np
 from nltk.corpus import wordnet as wn
 
 
-pklfile = open('wn-word-corpus.pkl','rb')
+pklfile = open('generated_files/wn-word-corpus.pkl','rb')
 sortedList = pickle.load(pklfile)
 pklfile.close()
 
-pklfile = open('wn-word-corpus-scores.pkl','rb')
+pklfile = open('generated_files/wn-word-corpus-scores.pkl','rb')
 sortedListScores = pickle.load(pklfile)
 pklfile.close()
 
-pklfile = open('base-buckets.pkl','rb')
+pklfile = open('generated_files/base-buckets.pkl','rb')
 tasteBucket,healthBucket,speedBucket = pickle.load(pklfile)
 pklfile.close()
 
@@ -33,12 +33,6 @@ healthwords = [sortedList[x] for x in maxHealthIndices]
 maxSpeedIndices = np.argsort([x[2] for x in sortedListScores])[::-1][:81]
 speedwords = [sortedList[x] for x in maxSpeedIndices]
 
-#print set(tastewords).intersection(set(healthwords))
-#
-#print set(tastewords).intersection(set(speedwords))
-#
-#print set(speedwords).intersection(set(healthwords))
-
 tasteBucket = list(set(tasteBucket + tastewords))
 
 healthBucket = list(set(healthBucket + healthwords))
@@ -49,6 +43,6 @@ print len(tasteBucket),tasteBucket
 print len(healthBucket),healthBucket
 print len(speedBucket),speedBucket
 
-pklfile = open('full-buckets.pkl','wb')
+pklfile = open('generated_files/full-buckets.pkl','wb')
 pickle.dump([tasteBucket,healthBucket,speedBucket],pklfile)
 pklfile.close()
